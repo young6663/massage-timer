@@ -615,7 +615,7 @@ function setStatus(text){
 }
 
 /* ========= 綁定 ========= */
-document.querySelectorAll('.startBtn').forEach(btn=>{
+document.querySelectorAll('.startBtn[data-min]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     primeSpeech();                 // 手勢當下解鎖語音引擎（關鍵修正）
     start(Number(btn.dataset.min));
