@@ -185,7 +185,7 @@
 
 <div class="tips">
   <p><strong>使用提醒：</strong>開始計時前，請把手機「媒體音量」調到約七至八成（不需要推到最頂，內建的音量壓縮器會讓提示音飽滿清晰又不破音）。計時期間本工具會自動保持螢幕喚醒、持續佔用音訊通道，提示音不會被系統調小。全程離線運作，不需要網路。</p>
-  <p><strong>報時規則：</strong>開始有鐘聲加簡短語音；每滿 10 分鐘輕聲報「剩幾分鐘」；最後 3 分鐘不說話，改用音階暗號——剩 3 分是 Do、剩 2 分是 Re、剩 1 分是 Mi，音愈高代表愈接近結束；時間到說「時間到」並播放約十秒輕柔旋律。15 分鐘療程時長較短，沒有中段報時，會直接進入最後 3 分鐘倒數。第一次使用建議先按「試聽流程」，完整聽過系統會用到的每一種播報（開始、報時、音階、時間到、暫停、繼續、停止確認）。</p>
+  <p><strong>報時規則：</strong>開始有鐘聲加簡短語音；每滿 10 分鐘輕聲報「剩幾分鐘」；最後 3 分鐘不說話，改用音階暗號——剩 3 分是 Do、剩 2 分是 Re、剩 1 分是 Mi，音愈高代表愈接近結束；時間到說「時間到」並播放約十秒輕柔旋律。15 分鐘療程時長較短，沒有中段報時，會直接進入最後 3 分鐘倒數。第一次使用建議先按「試聽流程」：約 45 秒完整模擬一場 60 分鐘療程的播報順序（含暫停與繼續的聲音），跟實際聽到的一模一樣。</p>
   <p><strong>暫停與停止：</strong>計時中可按「暫停」凍結時間，再按一次繼續；「停止」要按兩次才生效——第一次會語音確認，五秒內再按一次才停止，避免誤按中斷療程。</p>
 </div>
 
@@ -584,8 +584,10 @@ function stopTicking(){
   $app.classList.remove('running');
 }
 
-/* ========= 語音全覽：把系統會用到的「每一種」播報依序完整唸一遍，
-   不是模擬某個時長的流程，所以每一句都不會被跳過（含中段的「剩10分鐘」） ========= */
+/* ========= 試聽：完整模擬一場 60 分鐘療程的播報順序（濃縮時間軸），
+   聽到的順序、鐘聲搭配都與真實計時一模一樣——開始→剩50→40→30
+   →（示範暫停/繼續）→剩20→剩10→Do/Re/Mi→時間到→結束旋律。
+   不含停止相關句（這場模擬不停止）。 ========= */
 const DEMO_T = [];
 function clearDemo(){ DEMO_T.forEach(clearTimeout); DEMO_T.length = 0; }
 function playDemo(){
@@ -593,22 +595,27 @@ function playDemo(){
   clearDemo();
   ensureAudio();
   const step = (ms, fn)=> DEMO_T.push(setTimeout(fn, ms));
-  setStatus('語音全覽開始：依序播放全部種類的播報');
-  step(0,     ()=>{ setStatus('範例：開始計時'); SOUND.mark(); });
+  setStatus('試聽開始：模擬 60 分鐘療程的完整播報');
+  step(0,     ()=>{ setStatus('模擬：開始計時'); SOUND.mark(); });
   step(1600,  ()=> say('start60', '計時 60 分鐘，開始。'));
-  step(4200,  ()=>{ setStatus('範例：每 10 分鐘報時'); SOUND.mark(); });
-  step(5500,  ()=> say('r10', '剩 10 分鐘。'));
-  step(8000,  ()=>{ setStatus('範例：最後 3 分鐘音階——剩 3 分是 Do'); SOUND.scale(3); });
-  step(10500, ()=>{ setStatus('範例：剩 2 分是 Re'); SOUND.scale(2); });
-  step(13000, ()=>{ setStatus('範例：剩 1 分是 Mi'); SOUND.scale(1); });
-  step(15500, ()=>{ setStatus('範例：時間到'); say('finish', '時間到。'); });
-  step(17500, ()=> SOUND.music());
-  step(30500, ()=>{ setStatus('範例：暫停計時'); say('paused', '已暫停。'); });
-  step(33000, ()=>{ setStatus('範例：繼續計時'); say('resumed', '繼續計時。'); });
-  step(35500, ()=>{ setStatus('範例：按一次停止的確認語'); say('confirmstop', '再按一次，確認停止。'); });
-  step(38500, ()=>{ setStatus('範例：五秒內沒按第二次，自動取消'); say('cancelstop', '已取消，繼續計時。'); });
-  step(41500, ()=>{ setStatus('範例：真正停止'); say('stopped', '已停止。'); });
-  step(43500, ()=> setStatus('語音全覽結束。實際使用請按上方的時長按鈕開始計時'));
+  step(5000,  ()=>{ setStatus('模擬：剩 50 分鐘'); SOUND.mark(); });
+  step(6300,  ()=> say('r50', '剩 50 分鐘。'));
+  step(9500,  ()=>{ setStatus('模擬：剩 40 分鐘'); SOUND.mark(); });
+  step(10800, ()=> say('r40', '剩 40 分鐘。'));
+  step(14000, ()=>{ setStatus('模擬：剩 30 分鐘'); SOUND.mark(); });
+  step(15300, ()=> say('r30', '剩 30 分鐘。'));
+  step(18800, ()=>{ setStatus('模擬：按暫停的聲音'); say('paused', '已暫停。'); });
+  step(21800, ()=>{ setStatus('模擬：按繼續的聲音'); say('resumed', '繼續計時。'); });
+  step(25000, ()=>{ setStatus('模擬：剩 20 分鐘'); SOUND.mark(); });
+  step(26300, ()=> say('r20', '剩 20 分鐘。'));
+  step(29500, ()=>{ setStatus('模擬：剩 10 分鐘'); SOUND.mark(); });
+  step(30800, ()=> say('r10', '剩 10 分鐘。'));
+  step(34300, ()=>{ setStatus('模擬：最後 3 分鐘——剩 3 分是 Do'); SOUND.scale(3); });
+  step(36800, ()=>{ setStatus('模擬：剩 2 分是 Re'); SOUND.scale(2); });
+  step(39300, ()=>{ setStatus('模擬：剩 1 分是 Mi'); SOUND.scale(1); });
+  step(41800, ()=>{ setStatus('模擬：時間到'); say('finish', '時間到。'); });
+  step(44000, ()=> SOUND.music());
+  step(45000, ()=> setStatus('試聽結束。實際使用請按上方的時長按鈕開始計時'));
 }
 
 function renderRemain(ms){
