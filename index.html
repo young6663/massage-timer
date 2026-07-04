@@ -615,6 +615,8 @@ function setStatus(text){
 }
 
 /* ========= 綁定 ========= */
+/* 只綁定「有 data-min 屬性」的按鈕；試聽鈕(.startBtn.demo)沒有 data-min，
+   刻意不被選中——共用 .startBtn 只是借樣式，不代表要有開始計時行為 */
 document.querySelectorAll('.startBtn[data-min]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     primeSpeech();                 // 手勢當下解鎖語音引擎（關鍵修正）
