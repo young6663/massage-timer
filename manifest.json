@@ -1,0 +1,16 @@
+{
+  "name": "按摩計時器",
+  "short_name": "按摩計時器",
+  "description": "盲用按摩計時器：每10分鐘語音報時，最後3分鐘逐分倒數，完全離線。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0C10",
+  "theme_color": "#0A0C10",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
