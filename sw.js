@@ -1,7 +1,8 @@
-﻿/* ?閮????Ｙ?敹怠? Service Worker
-   摰????券瑼?摮脫?璈翰??銋???銝敺?霈敹怠?嚗??其?靘陷蝬脰楝??   ?湔??? VERSION ??1嚗蝙?刻????????拇活?喳?踹?啁???*/
+/* 離線快取 Service Worker
+   安裝後所有檔案存在本機快取，之後開啟不需網路也能用。
+   更新方式：VERSION 加 1，使用者下次開啟會自動抓新版並清掉舊快取。 */
 
-const VERSION = 'massage-timer-v7';
+const VERSION = 'massage-timer-v8';
 const FILES = [
   './',
   './index.html',
@@ -24,7 +25,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-/* 敹怠??芸?嚗蝺??賡?嚗?蝬脰楝???舀?啣翰??*/
+/* 快取優先，背景同步更新：離線可用，有網路時自動抓新版 */
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((hit) => {
