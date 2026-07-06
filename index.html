@@ -136,6 +136,7 @@
     background:#1B2130; color:var(--text);
   }
   select:focus-visible{outline:5px solid var(--focus); outline-offset:2px;}
+  #remain:focus-visible{outline:5px solid var(--focus); outline-offset:4px; border-radius:12px;}
 
   /* 使用說明收進可展開區塊：平時只佔一列，減少主畫面文字對低視能使用者的干擾 */
   .tips{max-width:560px; width:100%; margin-top:1.2rem;}
@@ -170,9 +171,10 @@
 
 <main id="app">
   <section id="clockCard" aria-label="剩餘時間顯示">
-    <div id="remain" role="timer" aria-live="off">--:--</div>
+    <div id="remain" role="timer" aria-live="off" tabindex="0">--:--</div>
+    <div id="remainAnnounce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div id="phase"></div>
-    <div id="status" aria-live="polite">請選擇療程時間開始計時</div>
+    <div id="status">請選擇療程時間開始計時</div>
   </section>
 
   <div class="btnRow" id="startRow">
@@ -230,6 +232,7 @@ const S = {
 };
 
 const $remain = document.getElementById('remain');
+const $remainAnnounce = document.getElementById('remainAnnounce');
 const $phase  = document.getElementById('phase');
 const $status = document.getElementById('status');
 const $app    = document.getElementById('app');
@@ -665,6 +668,34 @@ function renderRemain(ms){
 function setStatus(text){
   $status.textContent = text;
 }
+
+/* ========= 焦點播報：只有使用者把焦點停在剩餘時間上時，才每分鐘報一次，
+   避免螢幕報讀器（TalkBack／NVDA／VoiceOver）跟語音包同時搶著唸 ========= */
+function currentRemainMin(){
+  if (!S.running) return null;
+  const elapsedMs = S.paused ? (S.pausedAt - S.startTime) : (Date.now() - S.startTime);
+  const remainMs  = Math.max(0, S.totalMin * 60000 - elapsedMs);
+  return Math.round(remainMs / 60000);
+}
+let remainAnnounceTimer = null;
+function announceRemain(){
+  const min = currentRemainMin();
+  if (min === null) return;
+  $remainAnnounce.textContent = '剩 ' + min + ' 分鐘';
+}
+function startRemainAnnounce(){
+  if (!S.running) return;
+  announceRemain();
+  clearInterval(remainAnnounceTimer);
+  remainAnnounceTimer = setInterval(announceRemain, 60000);
+}
+function stopRemainAnnounce(){
+  clearInterval(remainAnnounceTimer);
+  remainAnnounceTimer = null;
+  $remainAnnounce.textContent = '';
+}
+$remain.addEventListener('focus', startRemainAnnounce);
+$remain.addEventListener('blur', stopRemainAnnounce);
 
 /* ========= 綁定 ========= */
 /* 只綁定「有 data-min 屬性」的按鈕；試聽鈕(.startBtn.demo)沒有 data-min，
