@@ -2,7 +2,7 @@
    安裝後所有檔案存在本機快取，之後開啟不需網路也能用。
    更新方式：VERSION 加 1，使用者下次開啟會自動抓新版並清掉舊快取。 */
 
-const VERSION = 'massage-timer-v22';
+const VERSION = 'massage-timer-v23';
 const FILES = [
   './',
   './index.html',
