@@ -2,7 +2,7 @@
    安裝後所有檔案存在本機快取，之後開啟不需網路也能用。
    更新方式：VERSION 加 1，使用者下次開啟會自動抓新版並清掉舊快取。 */
 
-const VERSION = 'massage-timer-v18';
+const VERSION = 'massage-timer-v19';
 const FILES = [
   './',
   './index.html',
@@ -22,6 +22,19 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
+  );
+});
+
+/* 點「時間到」通知 → 回到（或開啟）計時器頁面 */
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ('focus' in c) return c.focus();
+      }
+      return self.clients.openWindow('./');
+    })
   );
 });
 
