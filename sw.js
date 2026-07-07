@@ -2,7 +2,7 @@
    安裝後所有檔案存在本機快取，之後開啟不需網路也能用。
    更新方式：VERSION 加 1，使用者下次開啟會自動抓新版並清掉舊快取。 */
 
-const VERSION = 'massage-timer-v20';
+const VERSION = 'massage-timer-v21';
 const FILES = [
   './',
   './index.html',
@@ -30,6 +30,9 @@ self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      /* 優先聚焦計時器既有的分頁（避免另開新分頁）；真的沒有才開新的 */
+      const mine = list.find((c) => c.url && c.url.indexOf('massage-timer') !== -1);
+      if (mine && 'focus' in mine) return mine.focus();
       for (const c of list) {
         if ('focus' in c) return c.focus();
       }
