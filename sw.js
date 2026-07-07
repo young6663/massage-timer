@@ -2,7 +2,7 @@
    安裝後所有檔案存在本機快取，之後開啟不需網路也能用。
    更新方式：VERSION 加 1，使用者下次開啟會自動抓新版並清掉舊快取。 */
 
-const VERSION = 'massage-timer-v23';
+const VERSION = 'massage-timer-v24';
 const FILES = [
   './',
   './index.html',
@@ -41,8 +41,28 @@ self.addEventListener('notificationclick', (e) => {
   );
 });
 
-/* 快取優先，背景同步更新：離線可用，有網路時自動抓新版 */
+/* v24 改版：頁面本體（導覽請求）改成「網路優先」——只要有網路，
+   每次開啟／下拉重新整理都直接拿伺服器最新版，不再被舊快取擋掉；
+   只有真的離線才退回快取。舊版是快取優先，導致 iPhone 下拉重新整理
+   或直接開啟時永遠秒回舊版內容，即使伺服器早已更新（使用者實測回報：
+   「下拉怎麼沒用」）。圖示等次要資源維持快取優先，減少離線時的缺圖。 */
 self.addEventListener('fetch', (e) => {
+  const isPage = e.request.mode === 'navigate' ||
+    e.request.url.endsWith('/') || e.request.url.endsWith('index.html');
+
+  if (isPage){
+    e.respondWith(
+      fetch(e.request).then((res) => {
+        if (res && res.ok){
+          const clone = res.clone();
+          caches.open(VERSION).then((c) => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then((hit) => {
       const fetchAndUpdate = fetch(e.request).then((res) => {
